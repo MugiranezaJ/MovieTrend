@@ -21,3 +21,11 @@ export const getPopularTv = async () => {
   const resp = await axios.get(`${baseUrl}/tv/popular/?${apiKey}`);
   return resp.data.results;
 };
+
+// Get family movies shows
+export const getFamilyMovies = async () => {
+  const resp = await axios.get(
+    `${baseUrl}/discover/tv/?${apiKey}&with_genres=10751`,
+  );
+  return resp.data.results;
+};

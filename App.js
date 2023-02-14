@@ -6,16 +6,14 @@
  */
 
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import Home from './screens/Home';
 // import type {PropsWithChildren} from 'react';
 
 const App = () => {
   return (
     <View>
-      <Text>
-        <Home />
-      </Text>
+      <Home />
     </View>
   );
 };

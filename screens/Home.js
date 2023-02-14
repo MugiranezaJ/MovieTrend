@@ -1,15 +1,66 @@
 import React from 'react';
 import {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, Dimensions} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
-import {getPopularMovies, getUpcomingMovies} from '../services/services';
+import List from '../components/List';
+import Error from '../components/Error';
+import {
+  getFamilyMovies,
+  getPopularMovies,
+  getPopularTv,
+  getUpcomingMovies,
+} from '../services/services';
 
 const Home = () => {
-  const [moviesImages, setMoviesImage] = useState('');
-  const [error, setError] = useState();
+  const [moviesImages, setMoviesImage] = useState();
+  const [popularMovies, setPopularMovies] = useState();
+  const [popularTv, setPopularTv] = useState();
+  const [familyMovies, setFamilyMovies] = useState();
+  const [error, setError] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const dimensions = Dimensions.get('screen');
+
+  const getData = () => {
+    return Promise.all([
+      getUpcomingMovies(),
+      getPopularMovies(),
+      getPopularTv(),
+      getFamilyMovies(),
+    ]);
+  };
+
   useEffect(() => {
-    console.log('running....');
+    getData()
+      .then(
+        ([
+          upcomingMoviesData,
+          popularMoviesData,
+          popularTvData,
+          familyMoviesData,
+        ]) => {
+          const moviesImageArray = [];
+          for (let movie of upcomingMoviesData) {
+            moviesImageArray.push(
+              'https://image.tmdb.org/t/p/w500/' + movie.poster_path,
+            );
+          }
+          setMoviesImage(moviesImageArray);
+          setPopularMovies(popularMoviesData);
+          setPopularTv(popularTvData);
+          setFamilyMovies(familyMoviesData);
+          setLoaded(true);
+        },
+      )
+      .catch(() => {
+        setError(false);
+      });
+
     getUpcomingMovies()
       .then(movies => {
         const moviesImageArray = [];
@@ -20,24 +71,58 @@ const Home = () => {
         }
         setMoviesImage(moviesImageArray);
       })
-      .catch(err => setError(err));
-
-    getPopularMovies()
-      .then(movies => {
-        // setMovies(movies[0]);
-      })
-      .catch(err => setError(err));
+      .catch(() => setError(true))
+      .finally(() => setLoaded(true));
   }, []);
+
   return (
-    <View style={styles.sliderBoxContainer}>
-      <SliderBox
-        images={moviesImages}
-        autoplay={true}
-        dotStyle={styles.dotStyle}
-        sliderBoxHeight={dimensions.height / 1.5}
-        circleLoop={true}
-      />
-    </View>
+    <React.Fragment>
+      {loaded && !error && (
+        <ScrollView>
+          {/* Upcoming movies images */}
+          {moviesImages && (
+            <View style={styles.sliderBoxContainer}>
+              <SliderBox
+                images={moviesImages}
+                autoplay={true}
+                dotStyle={styles.dotStyle}
+                sliderBoxHeight={dimensions.height / 1.5}
+                circleLoop
+              />
+            </View>
+          )}
+
+          {/* Popular Movies */}
+          {popularMovies && (
+            <View style={styles.carousel}>
+              <List title={'Popular Movies'} content={popularMovies} />
+            </View>
+          )}
+
+          {/* Popular Tv series */}
+          {popularTv && (
+            <View style={styles.carousel}>
+              <List title={'Popular TV'} content={popularTv} />
+            </View>
+          )}
+
+          {/* Family Movies */}
+          {familyMovies && (
+            <View style={styles.carousel}>
+              <List title={'Family Movies'} content={familyMovies} />
+            </View>
+          )}
+        </ScrollView>
+      )}
+      {!loaded && (
+        <ActivityIndicator
+          style={{height: dimensions.height}}
+          size="large"
+          color="#0000ff"
+        />
+      )}
+      {error && <Error />}
+    </React.Fragment>
   );
 };
 
@@ -46,9 +131,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 100,
-    backgroundColor: 'blue',
-    // paddingTop: '100px',
+    marginBottom: 20,
+  },
+  carousel: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   dotStyle: {
     height: 0,
