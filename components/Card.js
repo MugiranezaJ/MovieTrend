@@ -9,9 +9,16 @@ const propTypes = {
 
 class Card extends React.PureComponent {
   render() {
-    const {item} = this.props;
+    const {navigation, item} = this.props;
     return (
-      <TouchableOpacity style={styles.container}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log('--------------------------------------------');
+          console.log('ID: ' + item.id, 'Poster_path: ' + item.poster_path);
+          console.log('--------------------------------------------');
+          navigation.navigate('Details', {movieId: item.id});
+        }}
+        style={styles.container}>
         <Image
           resizeMode="cover"
           style={styles.image}

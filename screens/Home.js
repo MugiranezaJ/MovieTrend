@@ -17,7 +17,7 @@ import {
   getUpcomingMovies,
 } from '../services/services';
 
-const Home = () => {
+const Home = ({navigation}) => {
   const [moviesImages, setMoviesImage] = useState();
   const [popularMovies, setPopularMovies] = useState();
   const [popularTv, setPopularTv] = useState();
@@ -95,21 +95,33 @@ const Home = () => {
           {/* Popular Movies */}
           {popularMovies && (
             <View style={styles.carousel}>
-              <List title={'Popular Movies'} content={popularMovies} />
+              <List
+                navigation={navigation}
+                title={'Popular Movies'}
+                content={popularMovies}
+              />
             </View>
           )}
 
           {/* Popular Tv series */}
           {popularTv && (
             <View style={styles.carousel}>
-              <List title={'Popular TV'} content={popularTv} />
+              <List
+                navigation={navigation}
+                title={'Popular TV'}
+                content={popularTv}
+              />
             </View>
           )}
 
           {/* Family Movies */}
           {familyMovies && (
             <View style={styles.carousel}>
-              <List title={'Family Movies'} content={familyMovies} />
+              <List
+                navigation={navigation}
+                title={'Family Movies'}
+                content={familyMovies}
+              />
             </View>
           )}
         </ScrollView>
