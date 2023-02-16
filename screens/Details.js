@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {
   Image,
   ScrollView,
+  View,
   Text,
   StyleSheet,
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import StarRating from 'react-native-star-rating';
 import {getMovie} from '../services/services';
 
 const height = Dimensions.get('screen').height;
@@ -16,11 +18,6 @@ const Details = ({route, navigation}) => {
   const [movieDetail, setMovieDetail] = useState();
   const [loaded, setLoaded] = useState(false);
   const placeholderImage = require('../assets/images/image-placeholder.jpg');
-  console.log('MovieId: ' + movieId);
-  console.log(
-    'MovieID: ' + movieDetail?.id,
-    'MoviePosterPath: ' + JSON.stringify(movieDetail?.poster_path),
-  );
 
   useEffect(() => {
     getMovie(movieId).then(movieData => {
@@ -45,6 +42,27 @@ const Details = ({route, navigation}) => {
                 : placeholderImage
             }
           />
+          <View style={styles.container}>
+            <Text style={styles.movieTile}>{movieDetail.title}</Text>
+            {movieDetail.genres && (
+              <View style={styles.genresContainer}>
+                {movieDetail.genres.map(genre => {
+                  return (
+                    <Text key={genre.id} style={styles.genre}>
+                      {genre.name}
+                    </Text>
+                  );
+                })}
+              </View>
+            )}
+            <StarRating
+              disabled
+              maxStars={5}
+              fullStarColor={'gold'}
+              starSize={25}
+              rating={movieDetail.vote_average}
+            />
+          </View>
         </ScrollView>
       )}
       {!loaded && <ActivityIndicator style={styles.loader} size={'large'} />}
@@ -53,12 +71,36 @@ const Details = ({route, navigation}) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    color: '#000',
+  },
   image: {
     height: height / 2,
   },
   loader: {
     height: height,
     color: '#0000ff',
+  },
+  movieTile: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 10,
+    color: '#000',
+  },
+  genresContainer: {
+    flexDirection: 'row',
+    alignContent: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  genre: {
+    marginRight: 10,
+    fontWeight: 'bold',
+    color: '#000',
   },
 });
 

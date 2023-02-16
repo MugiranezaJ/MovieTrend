@@ -13,9 +13,6 @@ class Card extends React.PureComponent {
     return (
       <TouchableOpacity
         onPress={() => {
-          console.log('--------------------------------------------');
-          console.log('ID: ' + item.id, 'Poster_path: ' + item.poster_path);
-          console.log('--------------------------------------------');
           navigation.navigate('Details', {movieId: item.id});
         }}
         style={styles.container}>
